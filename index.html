@@ -1,0 +1,20 @@
+<html>
+<head>
+<script src="js/keyboard.js"></script>
+<script src="js/keys.js"></script>
+<script src="js/predictive.js"></script>
+<link rel="stylesheet" href="css/keyboard.css">
+</head>
+<body>
+<div id="turnSignal"></div>
+<script>
+document.write(setKeyboard()); 
+// initialize the keyboard
+handleEvents('ARROWRIGHT');
+handleEvents('ARROWDOWN');
+// add the Turn Signal
+turnSignal(arrows[Number(!click1)][Number(click2)]);
+//document.addEventListener('keyup', handleEvents, true);
+</script>
+</body>
+</html>

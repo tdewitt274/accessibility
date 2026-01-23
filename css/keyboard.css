@@ -1,0 +1,42 @@
+TD { text-align:center; }
+table {
+  border-collapse: collapse;
+  height: 81vh;
+  width: 100%;
+  font-size:3em;
+}
+input[type="text"] {
+  width:100%;
+  font-size:3em;
+}
+ 
+td, th {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+ 
+.highlight_cols { background-color:yellow; color:black; }
+.highlight_rows { background-color:red; color:white; }
+ 
+.highlight_cols.highlight_rows {
+  background-color: orange;
+  border: 1px solid black;
+  color:white;
+}
+TH { display:none; }
+
+#turnSignal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height:100px;
+  width:100px;
+  margin: 10px; 
+  background-color: blue;
+  color:white;
+  font-size:5em;
+  text-align:center;
+}
+#keyboard {
+  font-family: monospace;
+}
