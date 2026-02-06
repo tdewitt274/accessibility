@@ -1,8 +1,11 @@
 <html>
 <head>
+<script src="js/db.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/predict.js"></script>
 <script src="js/keyboard.js"></script>
 <script src="js/keys.js"></script>
-<script src="js/predictive.js"></script>
+<!--<script src="js/predictive.js"></script>-->
 <link rel="stylesheet" href="css/keyboard.css">
 </head>
 <body>
@@ -14,6 +17,7 @@ handleEvents('ARROWRIGHT');
 handleEvents('ARROWDOWN');
 // add the Turn Signal
 turnSignal(arrows[Number(!click1)][Number(click2)]);
+setTableEvents();
 //document.addEventListener('keyup', handleEvents, true);
 </script>
 </body>

@@ -4,10 +4,11 @@ table {
   height: 81vh;
   width: 100%;
   font-size:3em;
+  table-layout: fixed
 }
 input[type="text"] {
   width:100%;
-  font-size:3em;
+  font-size:2.5em;
 }
  
 td, th {
@@ -39,4 +40,24 @@ TH { display:none; }
 }
 #keyboard {
   font-family: monospace;
+}
+#predict {
+  font-family: monospace;
+}
+#keyEntry {
+  font-family: monospace;
+  font-size:3em;
+  height: 1.25em;
+  border: 1px solid gray;
+  background-color:rgb(216, 216, 216);
+}
+/*#textValue {
+}*/
+#predictText {
+  display:inline-block;
+  font-weight:strong; 
+  color:red;
+}
+#wordList {
+  display:none;
 }

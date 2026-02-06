@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Keyboard Interaction Tracker</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+        }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #1e293b; }
+        #app { background: white; width: 90%; max-width: 500px; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); text-align: center; }
+        #instruction { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--primary); }
+        #timer { font-size: 4rem; font-weight: 900; color: var(--danger); height: 80px; margin: 0.5rem 0; }
+        #live-stats { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; font-family: monospace; font-size: 0.9rem; min-height: 50px; }
+        #progress { font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .controls { margin-top: 2rem; }
+        button { background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.1s; }
+        button:active { transform: scale(0.98); }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.9rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        th { background: #f8fafc; }
+        .hidden { display: none; }
+        .key-hint { color: var(--secondary); font-size: 0.8rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="ui-content">
+        <div id="progress">Ready to start</div>
+        <div id="instruction">Clicker Precision Test</div>
+        <div id="timer"></div>
+        <div id="live-stats">Waiting for input...</div>
+        <div class="key-hint">Left = [Control] | Right = [Alt]</div>
+        <div class="controls">
+            <button id="startBtn">Start 80-Task Session</button>
+        </div>
+    </div>
+
+    <div id="results" class="hidden">
+        <h2>Session Results</h2>
+        <div id="resultsContent"></div>
+        <button onclick="location.reload()" style="margin-top: 2rem;">Restart Test</button>
+    </div>
+</div>
+
+<script>
+const instructionEl = document.getElementById('instruction');
+const timerEl = document.getElementById('timer');
+const progressEl = document.getElementById('progress');
+const liveStatsEl = document.getElementById('live-stats');
+const startBtn = document.getElementById('startBtn');
+const resultsDiv = document.getElementById('results');
+const uiContent = document.getElementById('ui-content');
+let maxTest = 2;
+
+let results = {
+    left: { clicks: [], longPress: [], intervals: [] },
+    right: { clicks: [], longPress: [], intervals: [] }
+};
+
+const KEY_MAP = { 'Control': 'left', 'Alt': 'right' };
+
+startBtn.onclick = async () => {
+    startBtn.parentElement.classList.add('hidden');
+    await startTest();
+};
+
+async function startTest() {
+    const tasks = ["single click", "double click", "triple click", "long press"];
+    
+    for (let side of ['left', 'right']) {
+        for (let i = 1; i <= maxTest; i++) {
+            for (let task of tasks) {
+                const keyDisplay = side === 'left' ? 'CONTROL' : 'ALT';
+                progressEl.innerText = `Button: ${keyDisplay} | Cycle: ${i}/${maxTest}`;
+                instructionEl.innerText = `Perform a ${task}`;
+                liveStatsEl.innerText = "Listening for input...";
+                
+                const data = await listenFreeform(side, task);
+                
+                if (task === "long press") {
+                    // In freeform long press, we take the max duration held during the window
+                    const longest = Math.max(...data.durations, 0);
+                    results[side].longPress.push(longest);
+                } else {
+                    results[side].clicks.push(...data.durations);
+                    results[side].intervals.push(...data.intervals);
+                }
+
+                await runCountdown(3);
+            }
+        }
+    }
+    showFinalResults();
+}
+
+function listenFreeform(targetSide, taskType) {
+    return new Promise((resolve) => {
+        let durations = [];
+        let intervals = [];
+        let lastUpTime = 0;
+        let isPressed = false;
+        let finishTimer = null;
+
+        const onDown = (e) => {
+            const side = KEY_MAP[e.key];
+            if (side !== targetSide || isPressed) return;
+            
+            e.preventDefault();
+            clearTimeout(finishTimer); // User is still active, reset silence timer
+
+            isPressed = true;
+            const downTime = performance.now();
+            if (lastUpTime > 0) intervals.push(downTime - lastUpTime);
+
+            const onUp = (upEvent) => {
+                if (KEY_MAP[upEvent.key] !== targetSide) return;
+                
+                const upTime = performance.now();
+                const duration = upTime - downTime;
+                lastUpTime = upTime;
+                isPressed = false;
+                durations.push(duration);
+
+                liveStatsEl.innerText = `Registered ${durations.length} press(es)\nLast Dwell: ${duration.toFixed(1)}ms`;
+
+                window.removeEventListener('keyup', onUp);
+
+                // Wait for 1.2 seconds of silence to conclude the task
+                finishTimer = setTimeout(() => {
+                    window.removeEventListener('keydown', onDown);
+                    resolve({ durations, intervals });
+                }, 1200);
+            };
+            window.addEventListener('keyup', onUp);
+        };
+        window.addEventListener('keydown', onDown);
+    });
+}
+
+async function runCountdown(secs) {
+    liveStatsEl.innerText = "Recording saved.";
+    instructionEl.innerText = "Next Task In...";
+    for (let i = secs; i > 0; i--) {
+        timerEl.innerText = i;
+        await new Promise(r => setTimeout(r, 1000));
+    }
+    timerEl.innerText = "";
+}
+
+function showFinalResults() {
+    uiContent.classList.add('hidden');
+    resultsDiv.classList.remove('hidden');
+    
+    const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b)/arr.length).toFixed(2) : "0.00";
+    
+    document.getElementById('resultsContent').innerHTML = `
+        <table>
+            <tr><th>Metric (ms)</th><th>Ctrl (Left)</th><th>Alt (Right)</th></tr>
+            <tr><td>Avg Click Dwell</td><td>${avg(results.left.clicks)}</td><td>${avg(results.right.clicks)}</td></tr>
+            <tr><td>Avg Inter-Click Gap</td><td>${avg(results.left.intervals)}</td><td>${avg(results.right.intervals)}</td></tr>
+            <tr><td>Avg Long Press</td><td>${avg(results.left.longPress)}</td><td>${avg(results.right.longPress)}</td></tr>
+        </table>
+    `;
+}
+</script>
+
+</body>
+</html>

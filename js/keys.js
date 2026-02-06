@@ -1,8 +1,7 @@
 const config = {
     multiClickDelay: 400, // Time to wait for next tap
     longPressDelay: 700,  // How long to hold for a long press
-//TODO: Update with the F13-F24 keys
-    keysToTrack: ['Control', 'Alt'] // These are the keys the system is looking for
+    keysToTrack: ['Control', 'Alt', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24'] // These are the keys the system is looking for
 };
 
 let clickCount = 0;
@@ -29,6 +28,8 @@ window.addEventListener('keydown', (e) => {
         clearTimeout(clickTimer);
         clearTimeout(longPressTimer);
         handleAction('Both Buttons Pressed');
+        autoComplete();
+        console.log('Pedictive Mode');
         isLongPressActive = true; // Prevents "Single Click" on release
         return;
     }
@@ -39,7 +40,6 @@ window.addEventListener('keydown', (e) => {
         if (activeKeys.has(e.key) && activeKeys.size === 1) {
             switch (e.key) {
                 case config.keysToTrack[0]:  // Control - LEFT
-//                    handleEvents('ENTER'); // TODO: Predictive
                     break;
                 case config.keysToTrack[1]: // Alt - RIGHT
                     handleEvents('BACKSPACE');  // Backspace
@@ -54,9 +54,16 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
+    processEvent(e);
+});
+function processEvent(e) {
+    if (isHidden('keyboard')) { console.log('Keyboard inaccessible'); return; }
 // This function looks for the release of a button.  This is a reliable method for doing single actions.
 // Makes sure that the key is a not new key being pressed 
-    if (!config.keysToTrack.includes(e.key)) return;
+    if (!config.keysToTrack.includes(e.key)) {
+        handleEvents(e.key.toUpperCase());
+        return;
+    }
 // Timer is no longer needed because the key is released
     clearTimeout(longPressTimer);
     activeKeys.delete(e.key);
@@ -76,7 +83,7 @@ window.addEventListener('keyup', (e) => {
 // Basically, if a single click, then swap the logic on the "click1" and "click2" options and logging
                         if (clickCount === 1) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
                         if (clickCount === 2) { click2 = !click2; console.log('Switched Movement'); }  // Switch movement direction
-//                        if (clickCount === 3) { handleEvents('ENTER'); }
+//                        if (clickCount === 3) { predictMode(); console.log('Pedictive Mode'); } // Predictive Mode
                         break;
                     case config.keysToTrack[1]: // Alt - RIGHT
 // Basically, if a single/double/triple click, send a command to the function that handles the keyboard
@@ -101,7 +108,7 @@ window.addEventListener('keyup', (e) => {
             }, config.multiClickDelay);
         }
     }
-});
+}
 // click1/2 are for the movement of the keyboard coordinates
 let click1 = false; // false = right/left; true = down/up
 let click2 = false; // false = horizontal; true = vertical
