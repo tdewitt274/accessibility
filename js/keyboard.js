@@ -6,8 +6,8 @@ const aryKeyboards = [
   , ['Alpha',[['A|B|C|D|E|F| |1|2'],['G|H|I|J|K|L| |3|4'],['M|N|O|P|Q|R| |5|6'],['S|T|U|V|W|X| |7|8'],['@|#|Y|Z|.|+| |9|0'],[' ']]]
   , ['QWERTY',[['&#128077;-1|1|2|3|4|5|6|7|8|9|0|&#9881;-2']
               ,['&#128078;-1|Q|W|E|R|T|Y|U|I|O|P|&#10096;&#10096;-2']
-              ,['MAYBE-1|A|S|D|F|G|H|J|K|L|\'|&#9166;-2']
-              ,['HELP-1|Z|X|C|V|B|N|M|,|.|?|:|/']
+              ,['&#8660;-1|A|S|D|F|G|H|J|K|L|\'|&#9166;-2']
+              ,['&#x26A0;-1|Z|X|C|V|B|N|M|,|.|?|:|/']
               ,['&#128214;-1| -11|CLR-1']]]
   , ['QWERTY',[['1|2|3|4|5|6|7|8|9|0'],['Q|W|E|R|T|Y|U|I|O|P'],['A|S|D|F|G|H|J|K|L|\''],['Z|X|C|V|B|N|M|,|.|?'],[' -10']]]
 ]
@@ -125,18 +125,28 @@ function handleEvents(keyVal) {
       break;
 //      curr.value += "_";
     case 'YES':
+    case '👍':
     case 'NO':
+    case '👎':
     case 'MAYBE':
+    case '⇔':
+      if (key === '⇔') { key = "MAYBE"; }
+      if (key === '👍') { key = "YES"; }
+      if (key === '👎') { key = "NO"; }
       speakText(key);
       setActiveValue('');
       break;
+    case '⚠':
     case 'HELP':
-      alert('HELP');
+      if (key === '⚠') { key = "HELP"; }
+      speakText(key);
+//      alert('HELP');
       break;
     case '⚙': //'&#x2699;&#9881;' 
       alert('Settings');
       break;
     case '🕮': //'&#x2699;&#9881;' 
+    case '📖': //'&#x2699;&#9881;' 
       alert('Predict');
       break;
     case 'ENTER': // Registers the intersection value.  If it's the "SPACE (_)" option, include only a "_"
@@ -200,7 +210,7 @@ function setKeyboard() {
   let dataArray = aryKeyboards[currKeyboard][1]
   // Start the table HTML
   let tableHTML = '';
-  tableHTML += `<div id="keyEntry"><span id="textValue"></span><span id="predictText"></span></div>
+  tableHTML += `<div id="keyEntry" onclick="autoComplete();handleEvents('ESCAPE');"><span id="textValue"></span><span id="predictText"></span></div>
                 <div id="wordList"></div>
                 <!--<input type="text" id="active" disabled><br />-->
                 <input type="text" id="previous" disabled>`;
