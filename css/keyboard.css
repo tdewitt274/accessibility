@@ -8,12 +8,13 @@ table {
 }
 input[type="text"] {
   width:100%;
-  font-size:2.5em;
+  font-size:5em;
 }
  
 td, th {
   padding: 10px;
   border: 1px solid #ddd;
+  font-size: clamp(1em, 1vw, 32px);
 }
  
 .highlight_cols { background-color:yellow; color:black; }
@@ -46,7 +47,7 @@ TH { display:none; }
 }
 #keyEntry {
   font-family: monospace;
-  font-size:3em;
+  font-size:5em;
   height: 1.25em;
   border: 1px solid gray;
   background-color:rgb(216, 216, 216);

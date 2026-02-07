@@ -5,8 +5,8 @@ const aryKeyboards = [
     ['Alpha',[['A|B|C|D|E|F| |1|2'],['G|H|I|J|K|L| |3|4'],['M|N|O|P|Q|R| |5|6'],['S|T|U|V|W|X| |7|8'],['@|#|Y|Z|.|+| |9|0']]]
   , ['Alpha',[['A|B|C|D|E|F| |1|2'],['G|H|I|J|K|L| |3|4'],['M|N|O|P|Q|R| |5|6'],['S|T|U|V|W|X| |7|8'],['@|#|Y|Z|.|+| |9|0'],[' ']]]
   , ['QWERTY',[['&#128077;-1|1|2|3|4|5|6|7|8|9|0|&#9881;-2']
-              ,['&#128078;-1|Q|W|E|R|T|Y|U|I|O|P|&#10096;&#10096;-2']
-              ,['&#8660;-1|A|S|D|F|G|H|J|K|L|\'|&#9166;-2']
+              ,['&#8660;-1|Q|W|E|R|T|Y|U|I|O|P|&#10096;&#10096;-2']
+              ,['&#128078;-1|A|S|D|F|G|H|J|K|L|\'|&#9166;-2']
               ,['&#x26A0;-1|Z|X|C|V|B|N|M|,|.|?|:|/']
               ,['&#128214;-1| -11|CLR-1']]]
   , ['QWERTY',[['1|2|3|4|5|6|7|8|9|0'],['Q|W|E|R|T|Y|U|I|O|P'],['A|S|D|F|G|H|J|K|L|\''],['Z|X|C|V|B|N|M|,|.|?'],[' -10']]]
@@ -76,7 +76,12 @@ function handleEvents(keyVal) {
   if (key === 'SPACE (_)') { key = ' '; }
 
   // Keyboard controls are not needed, will bypass values
-  if (key === 'CONTROL' || key === 'ALT' || key === 'SHIFT' || key === 'TAB' || key === 'CAPSLOCK' || key === 'META' || key === 'CONTEXTMENU' || key === 'PRINTSCREEN') {
+  if (
+    key === 'CONTROL' || key === 'ALT' || key === 'SHIFT' || key === 'TAB' || key === 'CAPSLOCK' || key === 'META' || key === 'CONTEXTMENU' || key === 'PRINTSCREEN'
+    || key === 'F1' || key === 'F2' || key === 'F3' || key === 'F4' || key === 'F5' || key === 'F6' || key === 'F7' || key === 'F8' || key === 'F9' || key === 'F10' || key === 'F11' || key === 'F12' 
+     || key === 'SCROLLLOCK' || key === 'PAUSE' || key === 'INSERT' || key === 'HOME' || key === 'PAGEUP' || key === 'END' || key === 'PAGEDOWN' 
+     || key === '`'|| key === 'NUMLOCK'
+  ) {
     return;
   }
   let qry = key;  // For logging

@@ -7,6 +7,7 @@
 <script src="js/keys.js"></script>
 <!--<script src="js/predictive.js"></script>-->
 <link rel="stylesheet" href="css/keyboard.css">
+<link rel="manifest" href="manifest.webmainifest">
 </head>
 <body>
 <div id="turnSignal"></div>
@@ -19,6 +20,11 @@ handleEvents('ARROWDOWN');
 turnSignal(arrows[Number(!click1)][Number(click2)]);
 setTableEvents();
 //document.addEventListener('keyup', handleEvents, true);
+</script>
+<script>
+  if (typeof navigator.serviceWorker !== 'undefined') {
+    navigator.serviceWorker.register('js/sw.js')
+  }
 </script>
 </body>
 </html>
