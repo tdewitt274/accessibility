@@ -1,5 +1,6 @@
 <html>
 <head>
+<script src="js/functions.js"></script>
 <script src="js/db.js"></script>
 <script src="js/voice.js"></script>
 <script src="js/predict.js"></script>
@@ -9,8 +10,8 @@
 <link rel="stylesheet" href="css/keyboard.css">
 <link rel="manifest" href="manifest.webmainifest">
 </head>
-<body>
-<div id="turnSignal"></div>
+<body id="body">
+<div id="turnSignal" onclick="toggleFullScreen();" ontouchend="toggleFullScreen();"></div>
 <script>
 document.write(setKeyboard()); 
 // initialize the keyboard
@@ -25,6 +26,8 @@ setTableEvents();
   if (typeof navigator.serviceWorker !== 'undefined') {
     navigator.serviceWorker.register('js/sw.js')
   }
+
+toggleFullScreen();
 </script>
 </body>
 </html>

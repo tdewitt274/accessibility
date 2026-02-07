@@ -1,4 +1,10 @@
-TD { text-align:center; }
+BODY {
+  margin:0px;
+  padding:0px;
+  height: 100vh;
+  overflow: hidden;
+}
+TD { text-align:center; background-color:white; }
 table {
   border-collapse: collapse;
   height: 81vh;
