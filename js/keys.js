@@ -57,41 +57,146 @@ window.addEventListener('keyup', (e) => {
     processEvent(e);
 });
 function processEvent(e) {
+    handleControlEvent(e.key)
+}
+const scanModes = ['ROW','COL','PAUSED'];
+let scanModeVal = 0;
+function handleControlEvent(keyVal) {
     if (isHidden('keyboard')) { console.log('Keyboard inaccessible'); return; }
 // This function looks for the release of a button.  This is a reliable method for doing single actions.
 // Makes sure that the key is a not new key being pressed 
-    if (!config.keysToTrack.includes(e.key)) {
-        handleEvents(e.key.toUpperCase());
+    if (!config.keysToTrack.includes(keyVal)) {
+        handleEvents(keyVal.toUpperCase());
         return;
     }
 // Timer is no longer needed because the key is released
     clearTimeout(longPressTimer);
-    activeKeys.delete(e.key);
+    activeKeys.delete(keyVal);
 
     // Only process click counts if it wasn't a long press or a chord
-    if (!isLongPressActive && activeKeys.size === 0) {
+    if (activeKeys.size === 0) {
         clickCount++;
 // If there isn't an active timer, set one
         if (!clickTimer) {
             clickTimer = setTimeout(() => {
-                const keyName = e.key === ' ' ? 'Space' : e.key;  // Error handling for space key
+                const keyName = keyVal === ' ' ? 'Space' : keyVal;  // Error handling for space key
 
+                let dirVal = arrows[Number(!click1)][Number(click2)];
 // Enter logic to send the appropriate button to the handleEvents()
 // This logic will take the key that's being pushed and and checking it with appropriate keys
                 switch (keyName) {
-                    case config.keysToTrack[0]: // Control - LEFT
+                    case 'xControl': // Control - LEFT
 // Basically, if a single click, then swap the logic on the "click1" and "click2" options and logging
                         if (clickCount === 1) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
                         if (clickCount === 2) { click2 = !click2; console.log('Switched Movement'); }  // Switch movement direction
-//                        if (clickCount === 3) { predictMode(); console.log('Pedictive Mode'); } // Predictive Mode
+                        if (clickCount === 3) { predictMode(); console.log('Pedictive Mode'); } // Predictive Mode
                         break;
-                    case config.keysToTrack[1]: // Alt - RIGHT
+                    case 'xAlt': // Alt - RIGHT
 // Basically, if a single/double/triple click, send a command to the function that handles the keyboard
-                        let dirVal = arrows[Number(!click1)][Number(click2)];
+                        dirVal = arrows[Number(!click1)][Number(click2)];
 
-                        if (clickCount === 1) { handleEvents('arrow'+dirVal); console.log(`Moved ${'arrow'+dirVal}`); }
-                        if (clickCount === 2) { handleEvents('ENTER'); }   // Add text
-                        if (clickCount === 3) { handleEvents('ESCAPE'); }  // Register
+                        if (clickCount === 1 && !autoScanEnabled) { 
+                            handleEvents('arrow'+dirVal); //console.log(`Moved ${'arrow'+dirVal}`); 
+                        } else if (clickCount === 1 && autoScanEnabled) { 
+                            if (scanMode === 'ROW') {
+                                click1 = !click1;
+                                scanMode = 'COL';
+//                                handleEvents('arrow'+dirVal); //console.log(`Moved ${'arrow'+dirVal}`); 
+                            } else if (scanMode === 'COL') {
+                                scanMode = 'PAUSED';
+                            }
+                            if (scanMode === 'PAUSED') {
+                                handleEvents('ENTER'); 
+                                if (currCol === maxCol) { scanMode = 'ROW'; } else { scanMode = 'COL'; }
+                                break;
+                            }
+                        }
+                        if (clickCount === 2 && !autoScanEnabled) { 
+                            handleEvents('ENTER'); // Add text
+                        } else if (clickCount === 2 && autoScanEnabled) { 
+                            break;
+                        }
+                        if (clickCount === 3 && !autoScanEnabled) { 
+                            handleEvents('ESCAPE');   // Register
+                        } else if (clickCount === 3 && autoScanEnabled) { 
+
+                        }
+                        break;
+
+// In the event of additional buttons or changes to the code from CTRL + ALT
+                    case 'Control': // Control - LEFT
+                    case 'F13': // Button 1
+                        if (autoScanEnabled) { 
+                            if (clickCount === 1 && !isLongPressActive) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
+                            if (clickCount === 2 && !isLongPressActive) { click2 = !click2; console.log('Switched Coordinates'); }  // Switch XY option
+                            if (clickCount === 3 && !isLongPressActive) { predictMode();    console.log('Pedictive Mode');       } // Predictive Mode
+                            if (isLongPressActive) { } // Predictive Mode
+                        } else {
+                            if (clickCount === 1 && !isLongPressActive) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
+                            if (clickCount === 2 && !isLongPressActive) { click2 = !click2; console.log('Switched Coordinates'); }  // Switch XY option
+                            if (clickCount === 3 && !isLongPressActive) { predictMode();    console.log('Pedictive Mode');       } // Predictive Mode
+                            if (isLongPressActive) { } // Predictive Mode
+                        }
+                        break;
+                    case 'Alt': // Alt - RIGHT
+                    case 'F14': // Button 2
+                        dirVal = arrows[Number(!click1)][Number(click2)];
+                        if (autoScanEnabled) { 
+                            if (clickCount === 1 && !isLongPressActive) { 
+                                if (scanModes[scanModeVal] === 'ROW') {
+                                    scanModeVal++;
+                                    click1 = !click1;
+                                    scanMode = 'COL';
+                                } else if (scanModes[scanModeVal] === 'COL') {
+                                    scanModeVal++;
+                                    scanMode = 'PAUSED';
+                                }
+                                if (scanModes[scanModeVal] === 'PAUSED') {
+                                    handleEvents('ENTER'); 
+                                    if (currCol === maxCol) { 
+                                        scanModeVal = 0;
+                                        scanMode = 'ROW'; 
+                                    } else { 
+                                        scanModeVal = 1;
+                                        scanMode = 'COL'; 
+                                    }
+                                    break;
+                                }
+                                scanModeVal = scanModeVal > scanModes.length-1 ? 0 : scanModeVal;
+                            }
+                            if (clickCount === 2 && !isLongPressActive) { handleEvents('ESCAPE');  } 
+//                            if (clickCount === 3) { handleEvents('');  } 
+                            if (isLongPressActive && !isLongPressActive) { handleEvents('BACKSPACE'); } 
+                        } else {
+                            if (clickCount === 1 && !isLongPressActive) { handleEvents('arrow'+dirVal); }  // Switch XY option
+                            if (clickCount === 2 && !isLongPressActive) { handleEvents('ENTER');        } 
+                            if (clickCount === 3 && !isLongPressActive) { handleEvents('ESCAPE');       } 
+                            if (isLongPressActive) { handleEvents('BACKSPACE');   } 
+                        }
+                        break;
+                    case 'F15': // Button 3
+                        if (clickCount === 1 && !isLongPressActive) {  }  // Switch XY option
+                        if (clickCount === 2 && !isLongPressActive) {         } 
+                        if (clickCount === 3 && !isLongPressActive) {        } 
+                        if (isLongPressActive) { addWord("previous", 100); } 
+                        break;
+                    case 'F16': // Button 4
+                        break;
+                    case 'F17': // Button 5
+                        break;
+                    case 'F18': // Button 6
+                        break;
+                    case 'F19': // Button 7
+                        break;
+                    case 'F20': // Button 8
+                        break;
+                    case 'F21': // Button 9
+                        break;
+                    case 'F22': // Button 10
+                        break;
+                    case 'F23': // Button 11
+                        break;
+                    case 'F24': // Button 12
                         break;
                     default:
                         break;

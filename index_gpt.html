@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Accessible Web App – v1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="css/app.css">
+
+</head>
+<body>
+
+<div id="top-bar">
+    <div id="top-line-1">Ready</div>
+    <div id="top-line-2"></div>
+</div>
+
+<div id="app">
+
+  <!-- CENTRAL HUB -->
+  <section class="screen active" data-screen="center">
+    <div class="hub-grid">
+      <div class="tile" data-nav="up">UP</div>
+      <div class="tile" data-nav="left">LEFT</div>
+      <div class="tile" data-nav="right">RIGHT</div>
+      <div class="tile" data-nav="down">DOWN</div>
+    </div>
+  </section>
+
+  <!-- DIRECTIONAL SCREENS -->
+  <section class="screen" data-screen="up">
+    <div class="placeholder">UP SCREEN</div>
+  </section>
+
+  <section class="screen" data-screen="down">
+    <div class="placeholder">DOWN SCREEN</div>
+  </section>
+
+  <section class="screen" data-screen="left">
+    <div class="placeholder">LEFT SCREEN</div>
+  </section>
+
+  <section class="screen" data-screen="right">
+    <div class="placeholder">RIGHT SCREEN</div>
+  </section>
+
+</div>
+
+<!-- KEYBOARD -->
+<div id="keyboard" class="hidden"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

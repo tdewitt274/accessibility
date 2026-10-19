@@ -1,4 +1,4 @@
-const DB_NAME = 'SWACS';
+const DB_NAME = 'GAP';
 const DB_VERSION = 1;
 const DB_STORES = ['dictionary', 'settings']; // Define multiple stores
 
@@ -11,7 +11,11 @@ function openDB(dbname = DB_NAME, dbversion = DB_VERSION) {
             const db = event.target.result;
 
             // Create all defined stores
-            db.createObjectStore(DB_STORES[0], { keyPath: 'id', autoIncrement: false });
+//            db.createObjectStore(DB_STORES[0], { keyPath: 'id', autoIncrement: false });
+// Create stores with 'word' as keyPath for dictionary and 'id' for settings
+            if (!db.objectStoreNames.contains('dictionary')) {
+                db.createObjectStore('dictionary', { keyPath: 'word', autoIncrement: false });
+            }
             db.createObjectStore(DB_STORES[1], { keyPath: 'id', autoIncrement: false });
         };
 
@@ -48,7 +52,9 @@ async function saveToDB(item, storename, dbname = DB_NAME, dbversion = DB_VERSIO
         // First, check if the item already exists
         const existingItem = await checkIfItemExists(db, storename, item.id);
 
-        let text = "The entry already exists.  Are you sure you want to overwrite this item?\r\n\r\nThe item will be permanently modified.\r\n";
+        let text = `The entry already exists.  Are you sure you want to overwrite this item?
+
+The item will be permanently modified.\r\n`;
 
         let warn = true;
         if (existingItem) {
@@ -153,4 +159,46 @@ async function deleteFromDB(id, storename, dbname = DB_NAME, dbversion = DB_VERS
             reject(event.target.error);
         };
     });
+}
+/**
+ * Initializes IndexedDB for the dictionary:
+ * 1. Checks if the store is empty.
+ * 2. If empty, seeds the IndexedDB with the initial array values.
+ * 3. Reads all records from IndexedDB and merges/updates the in-memory array.
+ */
+async function initDictionaryDB() {
+    const db = await openDB();
+    const storedEntries = await getAllFromDB('dictionary');
+
+    if (storedEntries.length === 0) {
+        // First run: Seed IndexedDB with initial array entries
+        const transaction = db.transaction(['dictionary'], 'readwrite');
+        const store = transaction.objectStore('dictionary');
+
+        for (const entry of dictionary) {
+            store.put(entry);
+        }
+
+        await new Promise((resolve, reject) => {
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = (e) => reject(e.target.error);
+        });
+    } else {
+        // Subsequent runs: Merge DB items into the local in-memory array
+        const storedMap = new Map(storedEntries.map(item => [item.word, item]));
+
+        dictionary.forEach((item, index) => {
+            if (storedMap.has(item.word)) {
+                dictionary[index] = storedMap.get(item.word);
+                storedMap.delete(item.word);
+            }
+        });
+
+        // Add any additional items stored in IndexedDB that weren't in default array
+        for (const extraItem of storedMap.values()) {
+            dictionary.push(extraItem);
+        }
+    }
+
+    sortDictionary();
 }

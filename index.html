@@ -1,25 +1,56 @@
 <html>
 <head>
+<script>
+// Auto Scan Feature
+let autoScanEnabled = true;
+let autoScanSpeedMs = 2000; // Default 2 seconds
+let multiClickDelay = 400; // Time to wait for next tap
+let longPressDelay  = 700;  // How long to hold for a long press
+
+
+let scanMode = 'ROW'; // 'ROW' | 'COL' | 'PAUSED'
+let scanTimer = null;
+// Settings
+let altClickCount = 0;
+let altClickTimer = null;
+let ttsEnabled = true;
+</script>
 <script src="js/functions.js"></script>
-<script src="js/db.js"></script>
+<!--<script src="js/db.js"></script>-->
+<script defer src="js/indexedDB.js"></script>
+<script defer src="js/dictionary.js"></script>
 <script src="js/voice.js"></script>
-<script src="js/predict.js"></script>
 <script src="js/keyboard.js"></script>
 <script src="js/keys.js"></script>
 <!--<script src="js/predictive.js"></script>-->
 <link rel="stylesheet" href="css/keyboard.css">
+<link rel="stylesheet" href="css/modal.css">
 <link rel="manifest" href="manifest.webmainifest">
 </head>
 <body id="body">
+<div id="keyEntry" onclick="autoComplete();handleEvents('ESCAPE');">
+  <span id="textValue"></span><span id="predictText"></span>
+</div>
+<div id="wordList"></div>
+<!--<input type="text" id="active" disabled><br />-->
+<input type="text" id="previous" disabled>
 <div id="turnSignal" onclick="toggleFullScreen();" ontouchend="toggleFullScreen();"></div>
+<div id="divKeyboard"></div>
 <script>
-document.write(setKeyboard()); 
+//document.write(setKeyboard()); 
+function changeKeyboard() {
+  document.getElementById('divKeyboard').innerHTML = setKeyboard();
+  setTableEvents();
+}
+changeKeyboard();
+</script>
+<script>
 // initialize the keyboard
 handleEvents('ARROWRIGHT');
 handleEvents('ARROWDOWN');
 // add the Turn Signal
 turnSignal(arrows[Number(!click1)][Number(click2)]);
-setTableEvents();
+//setTableEvents();
 //document.addEventListener('keyup', handleEvents, true);
 </script>
 <script>
@@ -28,6 +59,228 @@ setTableEvents();
   }
 
 toggleFullScreen();
+
+let speechHeartbeat;
+const startSpeechHeartbeat = () => {
+  // Clear any existing interval to prevent duplicates
+  clearInterval(speechHeartbeat);
+  
+  speechHeartbeat = setInterval(() => {
+    // Only ping if the system isn't actively speaking something real
+    if (!window.speechSynthesis.speaking) {
+      const ping = new SpeechSynthesisUtterance(" ");
+      ping.volume = 0; // Completely silent
+      window.speechSynthesis.speak(ping);
+    }
+  }, 5000); // Ping every 5 seconds to prevent Chrome from sleeping
+};
+
+// Start the heartbeat as soon as the user interacts with the app the first time
+document.addEventListener('click', () => {
+  startSpeechHeartbeat();
+}, { once: true });
+
+window.onload = function() {
+  sortDictionary();
+//  renderKeyboard();
+  
+  speeds.forEach(val => loadSavedSettings(val.replace('gap_','').replace('_speed','')));
+  setKeyboardOptions();
+  loadSavedSettings("keyboards");
+  loadSavedSettings("autoscan");
+  loadSavedSettings("tts");
+
+  // Start initial row scan
+  handleRadio(0, 0);
+  if (autoScanEnabled) {
+    startAutoScan();
+  } else {
+//    updateStatusBadge();
+  }
+};
+
+function startAutoScan() {
+//return;
+  stopAutoScan();
+  if (!autoScanEnabled) {
+    scanMode = 'ROW';
+    clearAllClassNamesFromTable("keyboard");
+//    updateStatusBadge();
+    return;
+  }
+
+  scanTimer = setInterval(() => {
+    let dirVal = arrows[Number(!click1)][Number(click2)];
+    handleEvents('arrow'+dirVal,false);
+  }, autoScanSpeedMs);
+}
+function stopAutoScan() {
+  if (scanTimer) {
+    clearInterval(scanTimer);
+    scanTimer = null;
+  }
+}
+</script>
+<div id="settingsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Scanning Settings</div>
+        <button class="btn-control" onclick="closeSettingsModal()" style="padding: 4px 10px;">✕</button>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">
+          <span>Enable Auto-Scanning</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autoScanToggle" checked="" onchange="saveSetting('autoScan',this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <span style="font-size: 0.8rem; color: #888;">Automatically advances through rows and columns when active.</span>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">
+          <span>Scanning Speed</span>
+          <span id="autoscanDisplay" class="speed-value-display">2.0s</span>
+        </div>
+        <div class="setting-control">
+          <input type="range" id="autoscan" min="0.5" max="3.0" step="0.1" value="2.0" oninput="saveSetting('autoscan',this.value)" onchange="saveSetting('autoscan',this.value)">
+        </div>
+        <span style="font-size: 0.8rem; color: #888;">Adjust time interval per step (Default: 2.0s).</span>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">
+          <span>Multi Click Delay Speed</span>
+          <span id="multiclickDisplay" class="speed-value-display">0.5s</span>
+        </div>
+        <div class="setting-control">
+          <input type="range" id="multiclick" min="0.1" max="2.0" step="0.1" value="0.7" oninput="saveSetting('multiclick',this.value)" onchange="saveSetting('multiclick',this.value)">
+        </div>
+        <span style="font-size: 0.8rem; color: #888;">Adjust time interval per step (Default: 0.5s).</span>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">
+          <span>Long Press Delay Speed</span>
+          <span id="longpressDisplay" class="speed-value-display">0.5s</span>
+        </div>
+        <div class="setting-control">
+          <input type="range" id="longpress" min="0.1" max="2.0" step="0.1" value="0.7" oninput="saveSetting('longpress',this.value)" onchange="saveSetting('longpress',this.value)">
+        </div>
+        <span style="font-size: 0.8rem; color: #888;">Adjust time interval per step (Default: 0.5s).</span>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">
+          <span>Speech Synthesis</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="ttsToggle" checked="" onchange="saveSetting('tts',this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">
+          <span>Keyboard</span>
+          <select id="keyboards" name="keyboards" onchange="saveSetting('keyboards',this.value)">
+            <option value=""></option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-control" onclick="closeSettingsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+<script> 
+function openSettingsModal() {
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function toggleAutoScanSetting(enabled) {
+  autoScanEnabled = enabled;
+  localStorage.setItem('gap_autoscan_enabled', enabled);
+  if (enabled) {
+    scanMode = 'ROW';
+    currRow = 0;
+    currCol = 0;
+    startAutoScan();
+  } else {
+    stopAutoScan();
+    scanMode = 'PAUSED';
+    clearAllClassNamesFromTable("keyboard");
+  }
+}
+
+let speeds = ['gap_autoscan_speed','gap_multiclick_speed','gap_longpress_speed'];
+function saveSetting(type, val) {
+  let idxSpeed = -1;
+  let speedSec = parseFloat(val) * 1000;
+  if (type === 'autoscan' )  { idxSpeed = 0; autoScanSpeedMs = speedSec; }
+  if (type === 'multiclick') { idxSpeed = 1; multiClickDelay = speedSec; }
+  if (type === 'longpress' ) { idxSpeed = 2; longPressDelay  = speedSec; }
+  if (idxSpeed != -1) {
+    localStorage.setItem(speeds[idxSpeed], speedSec);
+    document.getElementById(type + 'Display').textContent = (parseFloat(speedSec).toFixed(1) / 1000) + 's';
+    startAutoScan();
+  } else {
+    if (type === 'keyboards' ) { 
+      localStorage.setItem('gap_' + type, val);
+      currKeyboard = Number(val);
+      changeKeyboard();
+    } else if (type === 'autoScan' ) { 
+      localStorage.setItem('gap_' + type.toLowerCase() + '_enabled', val);
+      toggleAutoScanSetting(val);
+    } else if (type === 'tts' ) { 
+      localStorage.setItem('gap_' + type + '_enabled', val);
+      ttsEnabled = val;
+    }
+  }
+}
+function setKeyboardOptions() {
+  const selectElement = document.getElementById('keyboards');
+  aryKeyboards.forEach((item, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = item[0];
+    selectElement.appendChild(option);
+  });
+}
+function loadSavedSettings(type) {
+  let idxSpeed = -1;
+  let speedSec = 0;
+  if (type === 'autoscan' ) { idxSpeed = 0; speedSec = autoScanSpeedMs; }
+  if (type === 'multiclick') { idxSpeed = 1; speedSec = multiClickDelay; }
+  if (type === 'longpress' ) { idxSpeed = 2; speedSec = longPressDelay; }
+
+  if (idxSpeed != -1) {
+    let speedVal = parseFloat(localStorage.getItem(speeds[idxSpeed])) * 1000;
+    document.getElementById(speeds[idxSpeed].replace('gap_','').replace('_speed','')).value = speedVal;
+    document.getElementById(type + 'Display').textContent = (parseFloat(speedSec).toFixed(1) / 1000) + 's';
+    document.getElementById(type).value = (parseFloat(speedSec).toFixed(1) / 1000);
+  } else {
+    if (type === 'keyboards' ) { 
+      let optVal = localStorage.getItem('gap_' + type);
+      document.getElementById(type).value = optVal;
+      currKeyboard = Number(optVal);
+      changeKeyboard();
+    } else if (type === 'autoscan' ) { 
+      let optVal = localStorage.getItem('gap_' + type + '_enabled');
+      document.getElementById('autoScanToggle').checked = optVal;
+    } else if (type === 'tts' ) { 
+      let optVal = localStorage.getItem('gap_' + type + '_enabled');
+      document.getElementById('ttsToggle').checked = optVal;
+    }
+  }
+}
 </script>
 </body>
 </html>
