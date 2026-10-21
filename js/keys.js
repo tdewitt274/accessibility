@@ -174,7 +174,8 @@ function handleControlEvent(keyVal) {
                             if (isLongPressActive) { handleEvents('BACKSPACE');   } 
                         }
                         break;
-                    case 'F15': // Button 3
+                        case 'F15': // Button 3
+                        case 'END': // Button 3
                         if (clickCount === 1 && !isLongPressActive) {  }  // Switch XY option
                         if (clickCount === 2 && !isLongPressActive) {         } 
                         if (clickCount === 3 && !isLongPressActive) {        } 
