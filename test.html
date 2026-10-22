@@ -1,0 +1,156 @@
+<html>
+<head>
+<script>
+//https://dev.to/asaoluelijah/text-to-speech-in-3-lines-of-javascript-b8h
+//https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis
+
+let voiceMsg = new SpeechSynthesisUtterance();
+/*
+speechSynthesis.getVoices().forEach(function(voice) {
+  console.log(voice.name, voice.default ? voice.default :'');
+});
+*/
+function getVoices() {
+        return window.speechSynthesis.getVoices();
+}
+function speakText() {
+        voiceMsg.text = getLastWord();
+        window.speechSynthesis.speak(voiceMsg);
+}
+function getLastWord() {
+        textVal = document.getElementById("voiceText").value.replace("_"," ");
+        //textVal = textVal.split(' ');
+        if (textVal[textVal.length-1] === ' ' || textVal[textVal.length-1] === '_' ) {
+            // Get the last word   
+            return textVal;
+        }
+        console.log(textVal[textVal.length-1]);
+        return textVal[textVal.length-1];
+}
+function getAbbreviation(idx) {
+    
+}
+function setVoiceSettings() {
+        voiceMsg.voice  = voices[0]; // document.getElementById("voiceVoice").value
+        voiceMsg.volume = parseFloat(document.getElementById("voiceVolume").value); // From 0 to 1
+        voiceMsg.rate   = parseFloat(document.getElementById("voiceRate").value); // From 0.1 to 10
+        voiceMsg.pitch  = parseFloat(document.getElementById("voicePitch").value); // From 0 to 2
+        voiceMsg.lang   = 'en'; // document.getElementById("voiceLanguage").value
+}
+</script>
+<script>
+const aryOptions = ['Single Click','Double Click','Triple Click','Long Press'];
+const aryButtons = ['Left','Right'];
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; // The maximum is inclusive and the minimum is inclusive
+}
+
+function getRandomClick() {
+        let rndBtn = getRandomIntInclusive(0, aryButtons.length-1);
+        let rndOpt = getRandomIntInclusive(0, aryOptions.length-1);
+  document.getElementById("action").innerText = aryButtons[rndBtn] + ' ' + aryOptions[rndOpt];
+}
+</script>
+<script>
+sortDictionary();
+</script>
+</head>
+<body>
+<input id="voiceText" type="text" /><br />
+<label for="voiceVoice"   >Voice:    </label><select id="voiceVoice"    onchange="setVoiceSettings()"></select><br />
+<label for="voiceLanguage">Language: </label><select id="voiceLanguage" onchange="setVoiceSettings()"><option value="en">English</option></select><br />
+<label for="voiceVolume"  >Volume:   </label><input      id="voiceVolume" type="range" value="1" min="0.1" max="1"  step="0.1" onchange="setVoiceSettings()" /><br />
+<label for="voiceRate"    >Rate:     </label><input      id="voiceRange"  type="range" value="1" min="0.1" max="10" step="0.1" onchange="setVoiceSettings()" /><br />
+<label for="voicePitch"   >Pitch:    </label><input      id="voicePitch"  type="range" value="2" min="0"   max="2"  step="0.1" onchange="setVoiceSettings()" /><br />
+<button onclick="speakText()">Speak</button><br />
+<br />
+<code>
+Speech to Text will take the last character or last word (if a space was entered).
+TODO:
+ - Add Voices to the dropdown
+ - Associate the Voices in the Settings
+ - Languages population
+ - Test
+</code>
+
+
+<hr />
+
+
+<h1 id="action">Click to Start</h1>
+<button id="testButton">Click/Hold Me</button>
+<p id="log"></p>
+
+<script>
+let voices = getVoices();
+    const button = document.getElementById('testButton');
+    const log = document.getElementById('log');
+    let startTime, endTime;
+    let longPressTimer;
+    const LONG_PRESS_DELAY = 500; // ms
+
+    // 1. Detect Press Start
+    button.addEventListener('mousedown', (e) => {
+        startTime = performance.now();
+
+        // Start a timer to detect a long press
+        longPressTimer = setTimeout(() => {
+            log.innerText += "\nLong Press Started";
+        }, LONG_PRESS_DELAY);
+    });
+
+    // 2. Detect Press End
+    button.addEventListener('mouseup', (e) => {
+        clearTimeout(longPressTimer); // Cancel long press timer
+        endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(0);
+
+        // e.detail gives us 1, 2, 3, etc. for clicks
+        const clickType = e.detail;
+
+        let clickText = "";
+        if (duration >= LONG_PRESS_DELAY) {
+            clickText = "Long Press";
+        } else if (clickType === 1) {
+            clickText = "Single Click";
+        } else if (clickType === 2) {
+            clickText = "Double Click";
+        } else if (clickType === 3) {
+            clickText = "Triple Click";
+        }
+
+        log.innerText += `\n${clickText} (${duration}ms)`;
+                getRandomClick();
+    });
+
+    // Optional: Cancel if mouse drags out
+    button.addEventListener('mouseout', () => {
+        clearTimeout(longPressTimer);
+    });
+        //getRandomClick();
+</script>
+<code>
+This isn't working quite right.  Need to refactor so that it checks to see if the action is done before generating a new one.
+
+Will need to also add it to a log and save it to an indexedDB.
+
+Similar for Keyboard test.  Will keep track and evaluate the accuracy of the text.
+</code>
+
+
+<hr />
+
+
+<input id="textString" type="text" onkeyup="predictWord();"><button onclick="addWord();">Add</button>
+<span id="textValue"></span><span id="predictText" style="font-weight:strong; color:red;"></span><br />
+<div id="wordList"></div><br />
+<code>
+TODO:
+ - Need to check for existing and increment
+ - Need to Sort based on value then word
+ - Clear out the blank values
+</code>
+</body>
+</html>

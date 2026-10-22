@@ -25,7 +25,8 @@ let ttsEnabled = true;
 <!--<script src="js/predictive.js"></script>-->
 <link rel="stylesheet" href="css/keyboard.css">
 <link rel="stylesheet" href="css/modal.css">
-<link rel="manifest" href="manifest.webmainifest">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#222222">
 </head>
 <body id="body">
 <div id="keyEntry" onclick="autoComplete();handleEvents('ESCAPE');">
@@ -281,6 +282,19 @@ function loadSavedSettings(type) {
     }
   }
 }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('.sw.js')
+      .then((reg) =>{
+        console.log('Service Worker registered successfully:', reg.scope);
+      })
+      .catch((err) => {
+        console.log('Service Worker registration failed:', err);
+      });
+    })
+  }
 </script>
 </body>
 </html>
