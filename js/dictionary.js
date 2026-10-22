@@ -27,6 +27,7 @@ let dictionary = [
     ,{word: `Chapstick`, occurrence: 1, category: 'Assist', importance: 500, pronounce: ""}
     ,{word: `Blanket`, occurrence: 1, category: 'Assist', importance: 500, pronounce: ""}
     ,{word: `Oral care`, occurrence: 1, category: 'Assist', importance: 500, pronounce: ""}
+    ,{word: `I am hungry`, occurrence: 1, category: 'Assist', importance: 500, pronounce: ""}
     ,{word: `Contact my family`, occurrence: 1, category: 'Phrases', importance: 500, pronounce: ""}
     ,{word: `Talk to Doctor`, occurrence: 1, category: 'Phrases', importance: 500, pronounce: ""}
     ,{word: `What's happening?`, occurrence: 1, category: 'Phrases', importance: 500, pronounce: ""}
@@ -65,6 +66,7 @@ let dictionary = [
     ,{word: `April`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
     ,{word: `Joanne Andersen`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
     ,{word: `Todd DeWitt`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+//    ,{word: `LOL`, occurrence: 1, category: 'Abbreviations', importance: 1, pronounce: "Laugh Out Loud"}
 ];
 
 // Helper function to update IndexedDB directly without warning prompt

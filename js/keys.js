@@ -174,8 +174,8 @@ function handleControlEvent(keyVal) {
                             if (isLongPressActive) { handleEvents('BACKSPACE');   } 
                         }
                         break;
-                        case 'F15': // Button 3
-                        case 'END': // Button 3
+                    case 'F15': // Button 3
+                    case 'END': // Button 3
                         if (clickCount === 1 && !isLongPressActive) {  }  // Switch XY option
                         if (clickCount === 2 && !isLongPressActive) {         } 
                         if (clickCount === 3 && !isLongPressActive) {        } 
@@ -204,9 +204,9 @@ function handleControlEvent(keyVal) {
                 }
 // Update the "turn signal" in the upper right corner as needed and log the informaiton
                 turnSignal(arrows[Number(!click1)][Number(click2)]);
-                if (clickCount === 1) handleAction(`${keyName} Single Click`);
-                else if (clickCount === 2) handleAction(`${keyName} Double Click`);
-                else if (clickCount >= 3) handleAction(`${keyName} Triple Click`);
+                if (clickCount ===      1) { handleAction(`${keyName} Single Click`); }
+                else if (clickCount === 2) { handleAction(`${keyName} Double Click`); }
+                else if (clickCount >=  3) { handleAction(`${keyName} Triple Click`); }
 
                 clickCount = 0;
                 clickTimer = null;
