@@ -3,16 +3,19 @@ const CACHE_NAME = 'gap-cache';
 // Add whichever assets you want to pre-cache here:
 const PRECACHE_ASSETS = [
 //JS
+    './js/dictionary.js',
     './js/functions.js',
     './js/indexedDB.js',
-    './js/dictionary.js',
-    './js/voice.js',
     './js/keyboard.js',
     './js/keys.js',
+    './js/predictive.js',
+    './js/sw.js',
+    './js/voice.js',
 //Images
     './images/icon-192.png',
     './images/icon-512.png',
 //CSS
+    './css/app.css',
     './css/keyboard.css',
     './css/modal.css',
 //Root
