@@ -165,7 +165,7 @@ function handleControlEvent(keyVal) {
                                 scanModeVal = scanModeVal > scanModes.length-1 ? 0 : scanModeVal;
                             }
                             if (clickCount === 2 && !isLongPressActive) { handleEvents('ESCAPE');  } 
-                            if (clickCount === 3) { handleEvents('');  } 
+//                            if (clickCount === 3) { handleEvents('');  } 
                             if (isLongPressActive && !isLongPressActive) { handleEvents('BACKSPACE'); } 
                         } else {
                             if (clickCount === 1 && !isLongPressActive) { handleEvents('arrow'+dirVal); }  // Switch XY option
@@ -176,7 +176,7 @@ function handleControlEvent(keyVal) {
                         break;
                     case 'F15': // Button 3
                     case 'END': // Button 3
-                        if (clickCount === 1 && !isLongPressActive) { handleEvents('ESCAPE'); }  // Switch XY option
+                        if (clickCount === 1 && !isLongPressActive) {  }  // Switch XY option
                         if (clickCount === 2 && !isLongPressActive) {         } 
                         if (clickCount === 3 && !isLongPressActive) {        } 
                         if (isLongPressActive) { addWord("previous", 100); } 
