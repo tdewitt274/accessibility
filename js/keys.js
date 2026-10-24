@@ -175,8 +175,9 @@ function handleControlEvent(keyVal) {
                         }
                         break;
                     case 'F15': // Button 3
+                    case 'TAB': // Button 3
                     case 'END': // Button 3
-                        if (clickCount === 1 && !isLongPressActive) {  }  // Switch XY option
+                        if (clickCount === 1 && !isLongPressActive) { handleEvents('ESCAPE'); }  // Switch XY option
                         if (clickCount === 2 && !isLongPressActive) {         } 
                         if (clickCount === 3 && !isLongPressActive) {        } 
                         if (isLongPressActive) { addWord("previous", 100); } 

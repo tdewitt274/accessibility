@@ -24,7 +24,6 @@ const aryKeyboards = [
               ,['A|S|D|F|G|H|J|K|L|\'']
               ,['Z|X|C|V|B|N|M|,|.|?']
               ,[' -8|&#9881;-2']]]
-    ]]
 ]
 currKeyboard = 2;
 const maxCol = (aryKeyboards[currKeyboard][1][0][0].split('|')).length;
@@ -185,6 +184,7 @@ function handleEvents(keyVal,logInfo = true) {
     case '📖': //'&#x2699;&#9881;' 
 //      alert('Predict');
       key = "DICTIONARY"; 
+      openWordManagementModal();
       speakText(key);
       break;
     case 'ENTER': // Registers the intersection value.  If it's the "SPACE (_)" option, include only a "_"
