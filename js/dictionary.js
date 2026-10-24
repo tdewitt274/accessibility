@@ -13,7 +13,7 @@ let dictionary = [
     ,{word: `I need help`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
     ,{word: `Use the bathroom`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
     ,{word: `Suction Mouth`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
-    ,{word: `Suction trach`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
+    ,{word: `Suction Trach`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
     ,{word: `Do not resuscitate`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
     ,{word: `Check my catheter`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
     ,{word: `Do not intubate`, occurrence: 1, category: 'Help', importance: 500, pronounce: ""}
@@ -66,6 +66,25 @@ let dictionary = [
     ,{word: `April`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
     ,{word: `Joanne Andersen`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
     ,{word: `Todd DeWitt`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `I Want My Phone`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Watch YouTube`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Watch TV`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Go to Room`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Get in Bed`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `I Want a Treat`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Too Hot`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Too Cold`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Get into Chair`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Wife`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Glasses`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Go Outside`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Reheat Food`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Daughter`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Coke`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Sprite`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Change Clothes`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Change Bedding`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
+    ,{word: `Get Letter Board`, occurrence: 1, category: 'People', importance: 500, pronounce: ""}
 //    ,{word: `LOL`, occurrence: 1, category: 'Abbreviations', importance: 1, pronounce: "Laugh Out Loud"}
 ];
 
