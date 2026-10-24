@@ -170,7 +170,7 @@ function handleControlEvent(keyVal) {
                         } else {
                             if (clickCount === 1 && !isLongPressActive) { handleEvents('arrow'+dirVal); }  // Switch XY option
                             if (clickCount === 2 && !isLongPressActive) { handleEvents('ENTER');        } 
-//                            if (clickCount === 3 && !isLongPressActive) { handleEvents('ESCAPE');       } 
+                            if (clickCount === 3 && !isLongPressActive) { handleEvents('ESCAPE');       } 
                             if (isLongPressActive) { handleEvents('BACKSPACE');   } 
                         }
                         break;
