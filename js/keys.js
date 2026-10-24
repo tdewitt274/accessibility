@@ -165,7 +165,7 @@ function handleControlEvent(keyVal) {
                                 scanModeVal = scanModeVal > scanModes.length-1 ? 0 : scanModeVal;
                             }
                             if (clickCount === 2 && !isLongPressActive) { handleEvents('ESCAPE');  } 
-//                            if (clickCount === 3) { handleEvents('');  } 
+                            if (clickCount === 3) { handleEvents('');  } 
                             if (isLongPressActive && !isLongPressActive) { handleEvents('BACKSPACE'); } 
                         } else {
                             if (clickCount === 1 && !isLongPressActive) { handleEvents('arrow'+dirVal); }  // Switch XY option
