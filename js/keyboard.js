@@ -24,9 +24,6 @@ const aryKeyboards = [
               ,['A|S|D|F|G|H|J|K|L|\'']
               ,['Z|X|C|V|B|N|M|,|.|?']
               ,[' -8|&#9881;-2']]]
-  , ['Morse Code',[['O-2|M-2|T-2|E-2|I-2|5-2|H-2']
-              ,['Q-2|G-1|&nbsp;-1|U-2|V-2|']
-              ,['Y-2|K-2|N-1|&nbsp;-2|U-2|V-2|&#9881;-2']
     ]]
 ]
 currKeyboard = 2;
