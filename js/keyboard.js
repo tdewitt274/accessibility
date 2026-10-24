@@ -100,8 +100,8 @@ function handleEvents(keyVal,logInfo = true) {
 
   // Keyboard controls are not needed, will bypass values
   if (
-    key === 'CONTROL' || key === 'ALT' || key === 'SHIFT' || key === 'TAB' || key === 'CAPSLOCK' || key === 'META' || key === 'CONTEXTMENU' 
-    || key === 'PRINTSCREEN' || key === 'SCROLLLOCK' || key === 'PAUSE' || key === 'INSERT' || key === 'HOME' || key === 'PAGEUP' || key === 'END' 
+    key === 'CONTROL' || key === 'ALT' || key === 'SHIFT' || key === 'CAPSLOCK' || key === 'META' || key === 'CONTEXTMENU' 
+    || key === 'PRINTSCREEN' || key === 'SCROLLLOCK' || key === 'PAUSE' || key === 'INSERT' || key === 'HOME' || key === 'PAGEUP'  
     || key === 'PAGEDOWN' || key === '`' || key === 'NUMLOCK'
     || key === 'F1' || key === 'F2' || key === 'F3' || key === 'F4' || key === 'F5' || key === 'F6' || key === 'F7' || key === 'F8' || key === 'F9' 
     || key === 'F10' || key === 'F11' || key === 'F12' || key === 'F13' || key === 'F14' || key === 'F15' || key === 'F16' || key === 'F17' 
@@ -198,6 +198,8 @@ function handleEvents(keyVal,logInfo = true) {
       addWord();
       break;
     case '⏎':       // Keyboard option to register the data in the main field
+    case 'END':  // Keyboard option to register the data in the main field
+    case 'TAB':  // Keyboard option to register the data in the main field
     case 'ESCAPE':  // Keyboard option to register the data in the main field
       currVal = currVal.replaceAll('_',' ');
       document.getElementById("previous").value = currVal;
