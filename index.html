@@ -50,7 +50,7 @@ changeKeyboard();
 handleEvents('ARROWRIGHT');
 handleEvents('ARROWDOWN');
 // add the Turn Signal
-turnSignal(arrows[Number(!click1)][Number(click2)]);
+turnSignal('up');
 //setTableEvents();
 //document.addEventListener('keyup', handleEvents, true);
 </script>
@@ -88,7 +88,8 @@ window.onload = function() {
   speeds.forEach(val => loadSavedSettings(val.replace('gap_','').replace('_speed','')));
   setKeyboardOptions();
   loadSavedSettings("keyboards");
-  loadSavedSettings("autoscan");
+//  loadSavedSettings("autoscan");
+  loadSavedSettings("autoScan");
   loadSavedSettings("tts");
 
   // Start initial row scan
@@ -111,7 +112,7 @@ function startAutoScan() {
   }
 
   scanTimer = setInterval(() => {
-    let dirVal = arrows[Number(!click1)][Number(click2)];
+    let dirVal = aryArrows[tglVal];
     handleEvents('arrow'+dirVal,false);
   }, autoScanSpeedMs);
 }
@@ -177,7 +178,7 @@ function stopAutoScan() {
         <div class="setting-label">
           <span>Speech Synthesis</span>
           <label class="toggle-switch">
-            <input type="checkbox" id="ttsToggle" checked="" onchange="saveSetting('tts',this.checked)">
+            <input type="checkbox" id="tts" checked="" onchange="saveSetting('tts',this.checked)">
             <span class="slider"></span>
           </label>
         </div>
@@ -258,27 +259,31 @@ function setKeyboardOptions() {
 function loadSavedSettings(type) {
   let idxSpeed = -1;
   let speedSec = 0;
-  if (type === 'autoscan' ) { idxSpeed = 0; speedSec = autoScanSpeedMs; }
-  if (type === 'multiclick') { idxSpeed = 1; speedSec = multiClickDelay; }
-  if (type === 'longpress' ) { idxSpeed = 2; speedSec = longPressDelay; }
+  if (type === 'autoscan' ) { idxSpeed = 0; /*speedSec = autoScanSpeedMs;*/ }
+  if (type === 'multiclick') { idxSpeed = 1; /*speedSec = multiClickDelay;*/ }
+  if (type === 'longpress' ) { idxSpeed = 2; /*speedSec = longPressDelay;*/ }
 
   if (idxSpeed != -1) {
-    let speedVal = parseFloat(localStorage.getItem(speeds[idxSpeed])) * 1000;
+    let speedVal = parseFloat(localStorage.getItem(speeds[idxSpeed]));
     document.getElementById(speeds[idxSpeed].replace('gap_','').replace('_speed','')).value = speedVal;
-    document.getElementById(type + 'Display').textContent = (parseFloat(speedSec).toFixed(1) / 1000) + 's';
-    document.getElementById(type).value = (parseFloat(speedSec).toFixed(1) / 1000);
+    document.getElementById(type + 'Display').textContent = (parseFloat(speedVal).toFixed(1) / 1000) + 's';
+    document.getElementById(type).value = (parseFloat(speedVal).toFixed(1) / 1000);
   } else {
     if (type === 'keyboards' ) { 
       let optVal = localStorage.getItem('gap_' + type);
       document.getElementById(type).value = optVal;
       currKeyboard = Number(optVal);
       changeKeyboard();
-    } else if (type === 'autoscan' ) { 
-      let optVal = localStorage.getItem('gap_' + type + '_enabled');
+    } else if (type === 'autoScan' ) { 
+      let optVal = localStorage.getItem('gap_' + type.toLowerCase() + '_enabled');
+      if (optVal === "true") { optVal = true; } else if (optVal === "false") { optVal = false; }
       document.getElementById('autoScanToggle').checked = optVal;
+      toggleAutoScanSetting(optVal);
     } else if (type === 'tts' ) { 
       let optVal = localStorage.getItem('gap_' + type + '_enabled');
-      document.getElementById('ttsToggle').checked = optVal;
+      if (optVal === "true") { optVal = true; } else if (optVal === "false") { optVal = false; }
+      document.getElementById('tts').checked = optVal;
+      ttsEnabled = optVal;
     }
   }
 }
@@ -295,6 +300,183 @@ function loadSavedSettings(type) {
       });
     })
   }
+</script>
+<!-- Word Management Modal using your project's existing modal classes -->
+<div id="word-management-modal" class="modal-overlay">
+  <div class="modal-content settings-modal-content"> <!-- Replace with your exact settings modal class if different -->
+    <span class="close" id="close-word-modal">&times;</span>
+    <h2>Manage Database Entries</h2>
+    
+    <!-- Table listing IndexedDB entries -->
+    <div class="table-container">
+      <table id="word-db-table">
+        <thead>
+          <tr>
+            <th>Index / ID</th>
+            <th>Word</th>
+            <th>Category</th>
+            <th>Occurrence</th>
+          </tr>
+        </thead>
+        <tbody id="word-db-tbody">
+          <!-- Dynamically populated rows -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Edit Form matching your project's form styling -->
+    <form id="word-update-form">
+      <input type="hidden" id="edit-record-id">
+      
+      <div class="form-group">
+        <label for="edit-word-input">Word / Index Value:</label>
+        <input type="text" id="edit-word-input" required>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-category-input">Category:</label>
+        <input type="text" id="edit-category-input" list="category-list" required>
+        <datalist id="category-list">
+          <!-- Populated dynamically -->
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-occurrence-input">Occurrence:</label>
+        <input type="number" id="edit-occurrence-input" min="0" value="1" required>
+      </div>
+
+      <button type="button" id="update-word-btn">Update Record</button>
+    </form>
+  </div>
+</div>
+<script>
+// Function to open the modal and load IndexedDB entries
+async function openWordManagementModal() {
+  const modal = document.getElementById('word-management-modal');
+  modal.classList.add('open');
+  await loadIndexedDBEntriesToTable();
+}
+
+// Function to read and display all entries from IndexedDB
+async function loadIndexedDBEntriesToTable() {
+  try {
+    // Use your helper function to fetch all records from the 'words' store
+    const records = await getAllFromDB('dictionary');
+    
+    const tbody = document.getElementById('word-db-tbody');
+    const datalist = document.getElementById('category-list');
+    tbody.innerHTML = '';
+    
+    const categories = new Set();
+
+    records.forEach((record, index) => {
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      
+      const recordId = record.id !== undefined ? record.id : (record.word || index);
+
+      tr.innerHTML = `
+        <td>${recordId}</td>
+        <td>${record.word || ''}</td>
+        <td>${record.category || ''}</td>
+        <td>${record.occurrence || 0}</td>
+      `;
+
+      // Row click handler to populate form fields
+      tr.addEventListener('click', () => {
+        document.getElementById('edit-record-id').value = recordId;
+        document.getElementById('edit-word-input').value = record.word || '';
+        document.getElementById('edit-category-input').value = record.category || '';
+        document.getElementById('edit-occurrence-input').value = record.occurrence || 1;
+      });
+
+      tbody.appendChild(tr);
+
+      if (record.category) {
+        categories.add(record.category);
+      }
+    });
+
+    // Populate category datalist options
+    datalist.innerHTML = '';
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      datalist.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Error loading IndexedDB records via helper:", error);
+  }
+}
+// New updateWord function structured similarly to addWord
+function updateWord() {
+  const recordIdVal = document.getElementById('edit-record-id').value;
+  const wordVal = document.getElementById('edit-word-input').value.trim();
+  const categoryVal = document.getElementById('edit-category-input').value.trim();
+  const occurrenceVal = parseInt(document.getElementById('edit-occurrence-input').value, 10) || 0;
+
+  if (!wordVal) {
+    alert('Please specify a word value.');
+    return;
+  }
+
+  if (recordIdVal === '') {
+    alert('Please select a record from the table first.');
+    return;
+  }
+
+  // Parse key format correctly (numeric vs string keys)
+  const key = !isNaN(recordIdVal) ? Number(recordIdVal) : recordIdVal;
+
+  // Open a readwrite transaction matching standard addWord implementations
+  const transaction = db.transaction(['words'], 'readwrite');
+  const store = transaction.objectStore('words');
+
+  // Fetch the existing record first to ensure correct schema maintenance
+  const getRequest = store.get(key);
+
+  getRequest.onsuccess = function(event) {
+    let record = event.target.result;
+
+    if (!record) {
+      // Fallback object if record wasn't found directly by key
+      record = { word: wordVal };
+    }
+
+    // Update properties
+    record.word = wordVal;
+    record.category = categoryVal;
+    record.occurrence = occurrenceVal;
+
+    // Save changes using put() (similar transaction logic as addWord)
+    const putRequest = store.put(record, key);
+
+    putRequest.onsuccess = function() {
+      console.log('Record successfully updated in IndexedDB.');
+      loadIndexedDBEntriesToTable(); // Refresh table view
+      alert('Record updated successfully!');
+    };
+
+    putRequest.onerror = function(event) {
+      console.error('Error updating record:', event.target.error);
+      alert('Error updating record in database.');
+    };
+  };
+
+  getRequest.onerror = function(event) {
+    console.error('Error retrieving record for update:', event.target.error);
+  };
+}
+
+// Bind click event to your update button
+document.getElementById('update-word-btn').addEventListener('click', updateWord);
+
+// Modal close button logic (matching your settings modal behavior)
+document.getElementById('close-word-modal').addEventListener('click', () => {
+  document.getElementById('word-management-modal').style.display = 'none';
+});
 </script>
 </body>
 </html>
