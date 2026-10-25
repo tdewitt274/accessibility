@@ -24,10 +24,10 @@ td, th {
 }
  
 .highlight_cols { background-color:yellow; color:black; }
-.highlight_rows { background-color:red; color:white; }
+.highlight_rows { background-color:blue; color:white; }
  
 .highlight_cols.highlight_rows {
-  background-color: orange;
+  background-color: lime;
   border: 1px solid black;
   color:white;
 }
@@ -40,7 +40,7 @@ TH { display:none; }
   height:100px;
   width:100px;
   margin: 10px; 
-  background-color: blue;
+  background-color: red;
   color:white;
   font-size:5em;
   text-align:center;

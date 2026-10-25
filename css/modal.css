@@ -128,3 +128,67 @@
       border-top: 1px solid #333;
       padding-top: 16px;
     }
+/* Ensure the modal content stays within the viewport with margins */
+.modal-content, .settings-content {
+  max-height: 85vh; /* Never taller than 85% of the screen */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden; /* Prevent outer container overflow */
+}
+
+/* Allow the modal content body to scroll if needed, but keep the header/form pinned */
+.modal-content h2,
+.modal-content LABEL, 
+.modal-content .close-btn, 
+.modal-content .close {
+  flex-shrink: 0;
+      color:white;
+}
+
+/* Constrain the table container and enable internal vertical scrolling */
+.table-container {
+  max-height: 180px; /* Adjust this height as needed to fit your screen */
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  flex-shrink: 1;
+}
+
+/* Reduce table font size and padding to fit more compact rows */
+#word-db-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px; /* Smaller font size */
+}
+
+#word-db-table th, 
+#word-db-table td {
+  padding: 6px 8px; /* Compact padding */
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+#word-db-table th {
+  background-color: #f5f5f5;
+  position: sticky;
+  top: 0;
+  z-index: 1; /* Keeps header visible while scrolling through rows */
+}
+
+/* Make sure the form controls and update button stay nicely spaced below */
+#word-update-form {
+  overflow-y: auto; /* Allows form to scroll if screen is very small */
+  flex-grow: 1;
+  padding-right: 4px; /* Prevent scrollbar overlap */
+}
+
+#word-update-form .form-group {
+  margin-bottom: 10px;
+}
+
+#word-update-form input {
+  font-size: 13px;
+  padding: 6px;
+}
