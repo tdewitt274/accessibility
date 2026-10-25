@@ -83,7 +83,7 @@ function handleControlEvent(keyVal) {
             clickTimer = setTimeout(() => {
                 const keyName = keyVal === ' ' ? 'Space' : keyVal;  // Error handling for space key
 
-//                let dirVal = arrows[Number(!click1)][Number(click2)];
+                let dirVal = aryArrows[tglVal];
 // Enter logic to send the appropriate button to the handleEvents()
 // This logic will take the key that's being pushed and and checking it with appropriate keys
                 switch (keyName) {
