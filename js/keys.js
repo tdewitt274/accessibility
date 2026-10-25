@@ -1,7 +1,7 @@
 const config = {
     multiClickDelay: 400, // Time to wait for next tap
     longPressDelay: 700,  // How long to hold for a long press
-    keysToTrack: ['Control', 'Alt', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24'] // These are the keys the system is looking for
+    keysToTrack: ['Control', 'Alt', 'End', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24'] // These are the keys the system is looking for
 };
 
 let clickCount = 0;
@@ -44,6 +44,8 @@ window.addEventListener('keydown', (e) => {
                 case config.keysToTrack[1]: // Alt - RIGHT
 //                    handleEvents('BACKSPACE');  // Backspace
                     break;
+                case config.keysToTrack[2]: // End - Yellow
+                    break;
                 default:
                     break;
             }
@@ -81,7 +83,7 @@ function handleControlEvent(keyVal) {
             clickTimer = setTimeout(() => {
                 const keyName = keyVal === ' ' ? 'Space' : keyVal;  // Error handling for space key
 
-                let dirVal = arrows[Number(!click1)][Number(click2)];
+//                let dirVal = arrows[Number(!click1)][Number(click2)];
 // Enter logic to send the appropriate button to the handleEvents()
 // This logic will take the key that's being pushed and and checking it with appropriate keys
                 switch (keyName) {
@@ -93,14 +95,15 @@ function handleControlEvent(keyVal) {
                         break;
                     case 'xAlt': // Alt - RIGHT
 // Basically, if a single/double/triple click, send a command to the function that handles the keyboard
-                        dirVal = arrows[Number(!click1)][Number(click2)];
+//                        dirVal = arrows[Number(!click1)][Number(click2)];
 
                         if (clickCount === 1 && !autoScanEnabled) { 
                             handleEvents('arrow'+dirVal); //console.log(`Moved ${'arrow'+dirVal}`); 
                         } else if (clickCount === 1 && autoScanEnabled) { 
                             if (scanMode === 'ROW') {
-                                click1 = !click1;
-                                scanMode = 'COL';
+//                                click1 = !click1;
+                                  tglVal++;
+                                  scanMode = 'COL';
 //                                handleEvents('arrow'+dirVal); //console.log(`Moved ${'arrow'+dirVal}`); 
                             } else if (scanMode === 'COL') {
                                 scanMode = 'PAUSED';
@@ -127,18 +130,18 @@ function handleControlEvent(keyVal) {
                     case 'Control': // Control - LEFT
                     case 'F13': // Button 1
                         if (autoScanEnabled) { 
-                            if (clickCount === 1 && !isLongPressActive) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
-                            if (clickCount === 2 && !isLongPressActive) { click2 = !click2; console.log('Switched Coordinates'); }  // Switch XY option
+                            if (clickCount === 1 && !isLongPressActive) { tglVal++; console.log('Switched Coordinates'); }  // Switch XY option
+                            if (clickCount === 2 && !isLongPressActive) { tglVal++; console.log('Switched Coordinates'); }  // Switch XY option
                             if (clickCount === 3 && !isLongPressActive) { predictMode();    console.log('Pedictive Mode');       } // Predictive Mode
                             if (isLongPressActive) { } // Predictive Mode
                         } else {
-                            if (clickCount === 1 && !isLongPressActive) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
-                            if (isLongPressActive) { click2 = !click2; } // Predictive Mode
+                            if (clickCount === 1 && !isLongPressActive) { tglVal++; console.log('Switched Coordinates'); }  // Switch XY option
+//                            if (isLongPressActive) { tglVal++; } // Predictive Mode
                         }
                         break;
                     case 'Alt': // Alt - RIGHT
                     case 'F14': // Button 2
-                        dirVal = arrows[Number(!click1)][Number(click2)];
+//                        dirVal = arrows[Number(!click1)][Number(click2)];
                         if (autoScanEnabled) { 
                         } else {
                             if (clickCount === 1 && !isLongPressActive) { handleEvents('arrow'+dirVal); }  // Switch XY option
@@ -147,7 +150,7 @@ function handleControlEvent(keyVal) {
                         break;
                     case 'F15': // Button 3
                     case 'TAB': // Button 3
-                    case 'END': // Button 3
+                    case 'End': // Button 3
                         if (clickCount === 1 && !isLongPressActive) { handleEvents('ESCAPE'); }  // Switch XY option
 //                        if (clickCount === 2 && !isLongPressActive) {         } 
 //                        if (clickCount === 3 && !isLongPressActive) {        } 
@@ -175,7 +178,7 @@ function handleControlEvent(keyVal) {
                         break;
                 }
 // Update the "turn signal" in the upper right corner as needed and log the informaiton
-                turnSignal(arrows[Number(!click1)][Number(click2)]);
+                turnSignal();
                 if (clickCount ===      1) { handleAction(`${keyName} Single Click`); }
                 else if (clickCount === 2) { handleAction(`${keyName} Double Click`); }
                 else if (clickCount >=  3) { handleAction(`${keyName} Triple Click`); }
@@ -192,29 +195,31 @@ let click1 = false; // false = right/left; true = down/up
 let click2 = false; // false = horizontal; true = vertical
 
 let toggle = true;  // For future use
-let tglVal = 0;  // For the turn signal
+let tglVal = 2;  // For the turn signal
 // Array of values for the arrow logic
 let arrows = [['right','left'],['down','up']];
-function turnSignal(arrow) {
+let aryArrows = ['up','right','down','left'];
+function turnSignal() {
 //TODO: Consider making this the primary process for switching the direction
 //  Option 1: Double Click L1, Click L1.
 //  Option 2: Clockwise rotation through the options.
-    switch (arrow) {
-        case 'right' : 
-            val = '&#8680; '
+    if (tglVal > 3) { tglVal = 0; }
+    if (tglVal <  0) { tglVal = 3; }
+
+    switch (tglVal) {
+        case 0 : 
+            val = '&#8679;'
             break;
-        case 'left' : 
-            val = '&#8678; '
+        case 1 : 
+            val = '&#8680;'
             break;
-        case 'down' : 
-            val = '&#8681; '
+        case 2 : 
+            val = '&#8681;'
             break;
-        case 'up' : 
-            val = '&#8679; '
+        case 3 : 
+            val = '&#8678;'
             break;
     }
-    if (tglVal >= 4) { tglVal = 0; }
-    if (tglVal <  0) { tglVal = 4; }
     document.getElementById('turnSignal').innerHTML = val;
 //    return arrow;
 }

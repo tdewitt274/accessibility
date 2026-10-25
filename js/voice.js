@@ -66,4 +66,4 @@ function setVoiceSettings() {
         voiceMsg.pitch  = parseFloat(document.getElementById("voicePitch").value); // From 0 to 2
         voiceMsg.lang   = 'en'; // document.getElementById("voiceLanguage").value
 }
-ttsEnabled = true;
+//ttsEnabled = true;
