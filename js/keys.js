@@ -42,7 +42,7 @@ window.addEventListener('keydown', (e) => {
                 case config.keysToTrack[0]:  // Control - LEFT
                     break;
                 case config.keysToTrack[1]: // Alt - RIGHT
-                    handleEvents('BACKSPACE');  // Backspace
+//                    handleEvents('BACKSPACE');  // Backspace
                     break;
                 default:
                     break;
@@ -133,54 +133,25 @@ function handleControlEvent(keyVal) {
                             if (isLongPressActive) { } // Predictive Mode
                         } else {
                             if (clickCount === 1 && !isLongPressActive) { click1 = !click1; console.log('Switched Coordinates'); }  // Switch XY option
-                            if (clickCount === 2 && !isLongPressActive) { click2 = !click2; console.log('Switched Coordinates'); }  // Switch XY option
-                            if (clickCount === 3 && !isLongPressActive) { predictMode();    console.log('Pedictive Mode');       } // Predictive Mode
-                            if (isLongPressActive) { } // Predictive Mode
+                            if (isLongPressActive) { click2 = !click2; } // Predictive Mode
                         }
                         break;
                     case 'Alt': // Alt - RIGHT
                     case 'F14': // Button 2
                         dirVal = arrows[Number(!click1)][Number(click2)];
                         if (autoScanEnabled) { 
-                            if (clickCount === 1 && !isLongPressActive) { 
-                                if (scanModes[scanModeVal] === 'ROW') {
-                                    scanModeVal++;
-                                    click1 = !click1;
-                                    scanMode = 'COL';
-                                } else if (scanModes[scanModeVal] === 'COL') {
-                                    scanModeVal++;
-                                    scanMode = 'PAUSED';
-                                }
-                                if (scanModes[scanModeVal] === 'PAUSED') {
-                                    handleEvents('ENTER'); 
-                                    if (currCol === maxCol) { 
-                                        scanModeVal = 0;
-                                        scanMode = 'ROW'; 
-                                    } else { 
-                                        scanModeVal = 1;
-                                        scanMode = 'COL'; 
-                                    }
-                                    break;
-                                }
-                                scanModeVal = scanModeVal > scanModes.length-1 ? 0 : scanModeVal;
-                            }
-                            if (clickCount === 2 && !isLongPressActive) { handleEvents('ESCAPE');  } 
-//                            if (clickCount === 3) { handleEvents('');  } 
-                            if (isLongPressActive && !isLongPressActive) { handleEvents('BACKSPACE'); } 
                         } else {
                             if (clickCount === 1 && !isLongPressActive) { handleEvents('arrow'+dirVal); }  // Switch XY option
-                            if (clickCount === 2 && !isLongPressActive) { handleEvents('ENTER');        } 
-                            if (clickCount === 3 && !isLongPressActive) { handleEvents('ESCAPE');       } 
-                            if (isLongPressActive) { handleEvents('BACKSPACE');   } 
+                            if (isLongPressActive) { handleEvents('ENTER');   } 
                         }
                         break;
                     case 'F15': // Button 3
                     case 'TAB': // Button 3
                     case 'END': // Button 3
                         if (clickCount === 1 && !isLongPressActive) { handleEvents('ESCAPE'); }  // Switch XY option
-                        if (clickCount === 2 && !isLongPressActive) {         } 
-                        if (clickCount === 3 && !isLongPressActive) {        } 
-                        if (isLongPressActive) { addWord("previous", 100); } 
+//                        if (clickCount === 2 && !isLongPressActive) {         } 
+//                        if (clickCount === 3 && !isLongPressActive) {        } 
+                        if (isLongPressActive) { handleEvents('BACKSPACE');   } 
                         break;
                     case 'F16': // Button 4
                         break;
